@@ -1,6 +1,8 @@
+import time
+
 import PySimpleGUI as sg
 import odrive
-from odrive.enums import *
+from odrive.enums import AxisState
 
 print('Searching for ODrive...')
 odrv0 = odrive.find_any()
@@ -21,13 +23,24 @@ while True:
     if event == sg.WIN_CLOSED:
         break
     elif event == 'Calibration':
-        odrv0.axis0.requested_state = odrv0.axis1.requested_state = AXIS_STATE_MOTOR_CALIBRATION
+        odrv0.axis0.requested_state = AxisState.MOTOR_CALIBRATION
+        time.sleep(0.5)
+        odrv0.axis1.requested_state = AxisState.MOTOR_CALIBRATION
+        time.sleep(0.5)
     elif event == 'IDLE':
-        odrv0.axis0.requested_state = odrv0.axis1.requested_state = AXIS_STATE_IDLE
+        odrv0.axis0.requested_state = AxisState.IDLE
+        time.sleep(0.5)
+        odrv0.axis1.requested_state = AxisState.IDLE
+        time.sleep(0.5)
     elif event == 'LOOP':
-        odrv0.axis0.requested_state = odrv0.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+        odrv0.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
+        time.sleep(0.5)
+        odrv0.axis1.requested_state = AxisState.CLOSED_LOOP_CONTROL
+        time.sleep(0.5)
     elif event == 'Send Setting':
         odrv0.axis0.controller.input_vel = int(values[0])
+        time.sleep(0.5)
         odrv0.axis1.controller.input_vel = int(values[1])
+        time.sleep(0.5)
 
 window.close()
