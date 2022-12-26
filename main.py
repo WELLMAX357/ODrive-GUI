@@ -25,16 +25,19 @@ print('Searching ODrive...')
 odrv0 = odrive.find_any()
 print('Find ODrive!!!')
 
+print(f'SN {hex(odrv0.serial_number).removeprefix("0x").upper()}')
+print(f'HW {odrv0.hw_version_major}.{odrv0.hw_version_minor}.{odrv0.hw_version_variant}')
+print(f'FW {odrv0.fw_version_major}.{odrv0.fw_version_minor}.{odrv0.fw_version_revision}')
 
 # add a touch of color
 sg.theme('Black')
-
 
 # all the stuff inside window
 layout = [
     [sg.Text('ODrive Motor Tuning')],
 
-    # [sg.Text('Voltage'), sg.Print(float(odrv0.vbus_voltage))],
+    # voltage
+    [sg.Text('Voltage'), sg.Text('Loading...', key='voltage')],
     
     # axis0
     [sg.Text('Axis0'),
@@ -54,16 +57,21 @@ layout = [
     [sg.Button('Calibration'), sg.Button('STOP'), sg.Button('LOOP'), sg.Button('Send Velocity')],
 ]
 
+
 # create window object
 window = sg.Window('ODrive GUI', layout)
 
 while True:
     # load events
-    event, values = window.read()
+    event, values = window.read(timeout=10000)
 
     # close window
     if event == sg.WIN_CLOSED:
         break
+
+    # update voltage
+    elif event == sg.TIMEOUT_EVENT:
+        window['voltage'].Update(round(float(odrv0.vbus_voltage), 2))
 
     # update axis0 value
     elif event == 'sl0':
@@ -80,7 +88,6 @@ while True:
     # start calibration
     elif event == 'Calibration':
         calibrate()
-        time.sleep(0.5)
 
     # stop rotaion
     elif event == 'STOP':
@@ -89,7 +96,6 @@ while True:
     # start rotation    
     elif event == 'LOOP':
         loop()
-        time.sleep(0.5)
 
     # send velocity
     elif event == 'Send Velocity':
